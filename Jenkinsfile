@@ -6,6 +6,7 @@ pipeline {
       idleMinutes 1
     }
   }
+
   stages {
     stage('Build') {
       parallel {
@@ -18,6 +19,7 @@ pipeline {
         }
       }
     }
+
     stage('Test') {
       parallel {
         stage('Unit Tests') {
@@ -29,6 +31,7 @@ pipeline {
         }
       }
     }
+
     stage('Package') {
       parallel {
         stage('Create Jarfile') {
@@ -40,18 +43,27 @@ pipeline {
         }
       }
     }
+
     stage('OCI Image BnP') {
-         steps {
-           container('kaniko') {
-             sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure
-    --skip-tls-verify --cache=true --destination=docker.ؤخة/v19mshazly1/dso-demo'
-              }
-            }
-          }
+      steps {
+        container('kaniko') {
+          sh '''
+            /kaniko/executor \
+              -f `pwd`/Dockerfile \
+              -c `pwd` \
+              --insecure \
+              --skip-tls-verify \
+              --cache=true \
+              --destination=docker.io/v19mshazly1/dso-demo
+          '''
+        }
+      }
+    }
+
     stage('Deploy to Dev') {
       steps {
-        // TODO
-        sh "echo done"
+        // TODO: Add real deployment logic
+        sh "echo Deployment to dev environment completed"
       }
     }
   }
