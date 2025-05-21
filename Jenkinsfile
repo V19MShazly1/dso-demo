@@ -28,6 +28,7 @@ pipeline {
               sh '''
                 # Install dependencies
                 apt-get update && apt-get install -y curl gpg
+                gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 105BD0E739499BDB
                 # Install RVM
                  curl -sSL https://get.rvm.io | bash -s stable
                  source ~/.rvm/scripts/rvm
