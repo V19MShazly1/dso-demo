@@ -22,6 +22,18 @@ pipeline {
 
     stage('Static Analysis') {
       parallel {
+        stage('OSS License Checker') {
+          steps {
+            container('licensefinder') {
+              sh '''
+                #!/bin/bash --login
+                rvm use default
+                gem install license_finder
+                license_finder
+              '''
+            }
+          }
+        }
         stage('Unit Tests') {
           steps {
             container('maven') {
@@ -37,12 +49,6 @@ pipeline {
               }
             }
           }
-        }
-      }
-      post {
-        always {
-          archiveArtifacts allowEmptyArchive: true, artifacts: 'target/dependency-check-report.html', fingerprint: true, onlyIfSuccessful: true
-          // dependencyCheckPublisher pattern: 'report.xml'
         }
       }
     }
@@ -64,6 +70,13 @@ pipeline {
         // TODO
         sh "echo done"
       }
+    }
+  }
+
+  post {
+    always {
+      archiveArtifacts allowEmptyArchive: true, artifacts: 'target/dependency-check-report.html', fingerprint: true, onlyIfSuccessful: true
+      // dependencyCheckPublisher pattern: 'report.xml'
     }
   }
 }
