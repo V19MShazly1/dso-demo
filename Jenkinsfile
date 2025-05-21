@@ -44,21 +44,21 @@ pipeline {
       }
     }
 
-    stage('OCI Image BnP') {
-      steps {
-        container('kaniko') {
-          sh '''
-            /kaniko/executor \
-              -f `pwd`/Dockerfile \
-              -c `pwd` \
-              --insecure \
-              --skip-tls-verify \
-              --cache=true \
-              --destination=docker.io/v19mshazly1/dso-demo
-          '''
-        }
-      }
-    }
+    		stage('OCI Image BnP') {
+    		  steps {
+    			container('kaniko') {
+    			  sh '''
+    				/kaniko/executor \
+    				  -f `pwd`/Dockerfile \
+    				  -c `pwd` \
+    				  --insecure \
+    				  --skip-tls-verify \
+    				  --cache=true \
+    				  --destination=docker.io/v19mshazly1/dso-demo
+    			  '''
+    			}
+    		  }
+    		}
 
     stage('Deploy to Dev') {
       steps {
