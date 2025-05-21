@@ -29,7 +29,7 @@ pipeline {
                 # Install dependencies
                 apt-get update && apt-get install -y curl gpg
                 # Install RVM
-                \curl -sSL https://get.rvm.io | bash -s stable
+                 curl -sSL https://get.rvm.io | bash -s stable
                  source ~/.rvm/scripts/rvm
                  # Install Ruby (if necessary)
                   rvm install 2.7.2
