@@ -31,7 +31,7 @@ pipeline {
                 gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 105BD0E739499BDB
                 # Install RVM
                  curl -sSL https://get.rvm.io | bash -s stable
-                 source ~/.rvm/scripts/rvm
+                 #source ~/.rvm/scripts/rvm
                  # Install Ruby (if necessary)
                   rvm install 2.7.2
                 #!/bin/bash --login
