@@ -26,13 +26,13 @@ pipeline {
           steps {
             container('licensefinder') {
               sh '''
+                #!/bin/bash 
                 # Install dependencies
                 apt-get update && apt-get install -y curl gpg gnupg2
                 gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 105BD0E739499BDB
                 # Install RVM
                  curl -sSL https://get.rvm.io | bash -s stable
-                 echo 'source /usr/local/rvm/scripts/rvm' >> /etc/profile.d/rvm.sh
-                 #!/bin/bash
+                 echo 'source /usr/local/rvm/scripts/rvm' >> /etc/profile.d/rvm.sh                 
                  source /usr/local/rvm/scripts/rvm
                  # Install Ruby (if necessary)
                   #rvm install 2.7.2
