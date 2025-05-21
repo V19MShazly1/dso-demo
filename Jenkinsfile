@@ -36,7 +36,7 @@ pipeline {
                  # Install Ruby (if necessary)
                  #rvm install 2.7.2
                 #!/bin/bash --login
-                rvm use default
+                #rvm use default
                 gem install license_finder
                 license_finder
               '''
