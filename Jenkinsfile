@@ -37,6 +37,7 @@ pipeline {
                  #rvm install 2.7.2
                 #!/bin/bash --login
                 #rvm use default
+                apk add --no-cache ruby ruby-dev build-base
                 gem install license_finder
                 license_finder
               '''
