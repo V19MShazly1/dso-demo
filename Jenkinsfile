@@ -8,6 +8,7 @@ pipeline {
   }
 
   stages {
+
     stage('Build') {
       parallel {
         stage('Compile') {
@@ -34,6 +35,7 @@ pipeline {
 
     stage('Package') {
       parallel {
+
         stage('Create Jarfile') {
           steps {
             container('maven') {
@@ -41,30 +43,31 @@ pipeline {
             }
           }
         }
+
+        stage('OCI Image BnP') {
+          steps {
+            container('kaniko') {
+              sh '''
+                /kaniko/executor \
+                  -f $(pwd)/Dockerfile \
+                  -c $(pwd) \
+                  --insecure \
+                  --skip-tls-verify \
+                  --cache=true \
+                  --destination=docker.io/v19mshazly1/dso-demo
+              '''
+            }
+          }
+        }
+
       }
     }
-
-    		stage('OCI Image BnP') {
-    		  steps {
-    			container('kaniko') {
-    			  sh '''
-    				/kaniko/executor \
-    				  -f `pwd`/Dockerfile \
-    				  -c `pwd` \
-    				  --insecure \
-    				  --skip-tls-verify \
-    				  --cache=true \
-    				  --destination=docker.io/v19mshazly1/dso-demo
-    			  '''
-    			}
-    		  }
-    		}
 
     stage('Deploy to Dev') {
       steps {
-        // TODO: Add real deployment logic
-        sh "echo Deployment to dev environment completed"
+        echo 'Deployment to dev environment completed'
       }
     }
+
   }
 }
