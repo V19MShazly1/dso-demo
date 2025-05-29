@@ -81,6 +81,18 @@ pipeline {
           }
         }
 
+        // ✅ New stage inserted here
+        stage('Verify BOM') {
+          steps {
+            container('maven') {
+              sh '''
+                echo "[DEBUG] Checking if target/bom.xml exists..."
+                ls -lh target/bom.xml || echo "⚠️ BOM file not found!"
+              '''
+            }
+          }
+        }
+
         stage('SCA') {
           steps {
             container('maven') {
@@ -120,7 +132,6 @@ pipeline {
         fingerprint: true,
         onlyIfSuccessful: true
       )
-      // dependencyCheckPublisher pattern: 'report.xml'
     }
   }
 }
