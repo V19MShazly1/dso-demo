@@ -8,6 +8,7 @@ pipeline {
   }
 
   stages {
+
     stage('Build') {
       parallel {
         stage('Compile') {
@@ -22,28 +23,31 @@ pipeline {
 
     stage('Static Analysis') {
       parallel {
+
         stage('OSS License Checker') {
           steps {
             container('licensefinder') {
               sh '''
-                #!/bin/bash 
+                #!/bin/bash
                 # Install dependencies
                 apt-get update && apt-get install -y curl gpg gnupg2
                 gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 105BD0E739499BDB
+
                 # Install RVM
-                 curl -sSL https://get.rvm.io | bash -s stable
-                 echo 'source /usr/local/rvm/scripts/rvm' >> /etc/profile.d/rvm.sh                 
-                 # Install Ruby (if necessary)
-                 #rvm install 2.7.2
-                #!/bin/bash --login
-                #rvm use default
+                curl -sSL https://get.rvm.io | bash -s stable
+                echo 'source /usr/local/rvm/scripts/rvm' >> /etc/profile.d/rvm.sh
+
+                # Install Ruby and License Finder
                 apt-get update && apt-get install -y ruby ruby-dev build-essential
                 gem install license_finder
+
+                # Run License Finder
                 license_finder
               '''
             }
           }
         }
+
         stage('Unit Tests') {
           steps {
             container('maven') {
@@ -51,6 +55,32 @@ pipeline {
             }
           }
         }
+
+        stage('Generate SBOM') {
+          steps {
+            container('maven') {
+              sh 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
+            }
+          }
+          post {
+            success {
+              dependencyTrackPublisher(
+                projectName: 'sample-spring-app',
+                projectVersion: '0.0.1',
+                artifact: 'target/bom.xml',
+                autoCreateProjects: true,
+                synchronous: true
+              )
+              archiveArtifacts(
+                allowEmptyArchive: true,
+                artifacts: 'target/bom.xml',
+                fingerprint: true,
+                onlyIfSuccessful: true
+              )
+            }
+          }
+        }
+
         stage('SCA') {
           steps {
             container('maven') {
@@ -77,7 +107,6 @@ pipeline {
 
     stage('Deploy to Dev') {
       steps {
-        // TODO
         sh "echo done"
       }
     }
@@ -85,7 +114,12 @@ pipeline {
 
   post {
     always {
-      archiveArtifacts allowEmptyArchive: true, artifacts: 'target/dependency-check-report.html', fingerprint: true, onlyIfSuccessful: true
+      archiveArtifacts(
+        allowEmptyArchive: true,
+        artifacts: 'target/dependency-check-report.html',
+        fingerprint: true,
+        onlyIfSuccessful: true
+      )
       // dependencyCheckPublisher pattern: 'report.xml'
     }
   }
